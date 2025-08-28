@@ -1889,6 +1889,68 @@
     "tonumber cannot be applied to \".e1\": invalid number"
     "tonumber cannot be applied to \"-.e\": invalid number"
 
+- name: fromhex function
+  args:
+    - "fromhex"
+  input: |
+    "0"
+    "0x0"
+    "ff"
+    "0xff"
+    "0xFF"
+    "FF"
+    "abcdef"
+    "ABCDEF"
+    "123456"
+    "0x123456"
+    "1A2B3C"
+    "0xFFFFFFFFFFFFFFFF"
+    "123456789ABCDEF0123456789ABCDEF"
+  expected: |
+    0
+    0
+    255
+    255
+    255
+    255
+    11259375
+    11259375
+    1193046
+    1193046
+    1715004
+    18446744073709551615
+    1512366075204170929049582354406559215
+
+- name: fromhex function error
+  args:
+    - "try fromhex catch ."
+  input: |
+    ""
+    "0x"
+    "0X"
+    "invalid"
+    "123z"
+    "xyz"
+    "0xghi"
+    " ff"
+    "ff "
+    123
+    null
+    true
+  expected: |
+    "fromhex cannot be applied to \"\": invalid hexadecimal number"
+    "fromhex cannot be applied to \"0x\": invalid hexadecimal number"
+    "fromhex cannot be applied to \"0X\": invalid hexadecimal number"
+    "fromhex cannot be applied to \"invalid\": invalid hexadecimal number"
+    "fromhex cannot be applied to \"123z\": invalid hexadecimal number"
+    "fromhex cannot be applied to \"xyz\": invalid hexadecimal number"
+    "fromhex cannot be applied to \"0xghi\": invalid hexadecimal number"
+    "fromhex cannot be applied to \" ff\": invalid hexadecimal number"
+    "fromhex cannot be applied to \"ff \": invalid hexadecimal number"
+    "fromhex cannot be applied to: number (123)"
+    "fromhex cannot be applied to: null"
+    "fromhex cannot be applied to: boolean (true)"
+
 - name: tostring function
   args:
     - 'tostring'

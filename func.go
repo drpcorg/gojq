@@ -62,6 +62,7 @@ func init() {
 		"add":            argFunc0(funcAdd),
 		"toboolean":      argFunc0(funcToBoolean),
 		"tonumber":       argFunc0(funcToNumber),
+		"fromhex":        argFunc0(funcFromHex),
 		"tostring":       argFunc0(funcToString),
 		"type":           argFunc0(funcType),
 		"reverse":        argFunc0(funcReverse),
@@ -550,6 +551,34 @@ func funcToNumber(v any) any {
 
 func toNumber(v string) any {
 	return normalizeNumber(json.Number(v))
+}
+
+func funcFromHex(v any) any {
+	s, ok := v.(string)
+	if !ok {
+		return &func0TypeError{"fromhex", v}
+	}
+
+	s = strings.TrimPrefix(s, "0x")
+	s = strings.TrimPrefix(s, "0X")
+
+	if s == "" {
+		return &func0WrapError{"fromhex", v, errors.New("invalid hexadecimal number")}
+	}
+
+	bigInt := new(big.Int)
+	if _, ok := bigInt.SetString(s, 16); !ok {
+		return &func0WrapError{"fromhex", v, errors.New("invalid hexadecimal number")}
+	}
+
+	if bigInt.IsInt64() {
+		i := bigInt.Int64()
+		if i >= -9007199254740991 && i <= 9007199254740991 {
+			return int(i)
+		}
+	}
+
+	return bigInt
 }
 
 func funcToString(v any) any {
